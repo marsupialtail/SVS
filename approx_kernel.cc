@@ -64,14 +64,14 @@ class TonyConvGradOp : public OpKernel {
     output_shape.AddDim(filter_y_);
 
 
-    std::cout << "result shape " <<  output_shape << std::endl;
+    //std::cout << "result shape " <<  output_shape << std::endl;
 
     OP_REQUIRES_OK(context,context->allocate_output(0,output_shape,&output_tensor));
 
     auto output = output_tensor->template flat<float>();
 
-    std::cout << input.data() << std::endl;
-    std::cout << input_dims[0] << input_dims[1] << input_dims[2] << std::endl;
+    //std::cout << input.data() << std::endl;
+    //std::cout << input_dims[0] << input_dims[1] << input_dims[2] << std::endl;
 
 
     const float * test = input.data();

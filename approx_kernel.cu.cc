@@ -39,7 +39,7 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
 
   }
 
-  printf("threadIdx %d %.2f", threadIdx.x, sum);
+  //printf("threadIdx %d %.2f", threadIdx.x, sum);
 
   int max_row = max_idx / dy_size[3] * stride;
   int max_col = max_idx % dy_size[3] * stride;
@@ -69,7 +69,7 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
         int data_idx = data_block_offset + data_thread_offset + data_channel_offset + data_row_offset + k;
         int input_idx = input_thread_offset + input_channel_offset + input_row_offset + k+max_col;
         data[data_idx] = input[input_idx] * sum;
-        printf("data %.f %.f %d %d %d %d ",data[data_idx], sum, input_idx, c, j, k);
+       //printf("data %.f %.f %d %d %d %d ",data[data_idx], sum, input_idx, c, j, k);
       }
     }
   }
@@ -102,21 +102,23 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
 void TonyConvGradKernelLauncher(const float * input, const int input_size_[], const float* dy, const int dy_size_[], float * output,
     int filter_x_,int filter_y_,int stride) {
 
-  std::cout << "dy size " << dy_size_[0] << " " <<  dy_size_[1] << " " << dy_size_[2] << " " << dy_size_[3] << std::endl;
-  std::cout << input_size_[0] << " " <<  input_size_[1] << " " << input_size_[2] << " " << input_size_[3] << std::endl;
+  //std::cout << "dy size " << dy_size_[0] << " " <<  dy_size_[1] << " " << dy_size_[2] << " " << dy_size_[3] << std::endl;
+  //std::cout << input_size_[0] << " " <<  input_size_[1] << " " << input_size_[2] << " " << input_size_[3] << std::endl;
   cudaMemcpyToSymbol(input_size,input_size_,sizeof(int)*4);
   cudaMemcpyToSymbol(dy_size,dy_size_,sizeof(int)*4);
   int data_size = dy_size_[1] * input_size_[0]*filter_x_*filter_y_*input_size_[1]*sizeof(float);
   float * data;
-  cudaMalloc(&data, data_size);
+  cudaMalloc((void**)&data, data_size);
 
-  std::cout << input_size_[0]*filter_x_*filter_y_*input_size_[1] << std::endl;
+  //std::cout << input_size_[0]*filter_x_*filter_y_*input_size_[1] << std::endl;
 
   TonyConvKernelDraft<<<dy_size_[1],input_size_[0]>>>(input,dy,data,output,filter_x_,filter_y_,stride);
 
-  std::cout << "kernel finished successfully" << std::endl;
+  //std::cout << "kernel finished successfully" << std::endl;
   //float *d_debug = (float*) malloc(sizeof(float)*filter_x_*filter_y_*input_size[1]*dy_size[1]);
-  std::cout << "transferred to debug host variable" << std::endl;
+  //std::cout << "transferred to debug host variable" << std::endl;
+
+  cudaFree(data);
 
 //  for(int i = 0;i<filter_x_*filter_y_*input_size[1]*dy_size[1];i++)
 //  {
