@@ -1,6 +1,6 @@
-# Support Vector Ssampling
+# Support Vector Sampling
 
-Follow the following steps to compile the kernel to a linked Tensorflow library.
+Follow the following steps to compile the kernel to a linked Tensorflow library. (Don't mind the _faster version)
 
 1. Install CUDA
 2. Install Tensorflow 1.9 (as long as it supports custom gradient, so 1.7 and above I think?)
