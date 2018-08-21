@@ -1,4 +1,4 @@
-# SVS
+# Support Vector Ssampling
 
 Follow the following steps to compile the kernel to a linked Tensorflow library.
 
