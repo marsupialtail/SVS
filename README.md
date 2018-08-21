@@ -31,3 +31,5 @@ Follow the following steps to test the kernel on Resnet on CIFAR10. If you are g
 2. Make sure the shared library file that you compiled earlier approx_kernel.so is in the resnet folder. 
 3. Replace resnet_model.py in the directory with resnet_model.py in the repo
 4. Run python cifar10_main.py with your desired options. 
+
+Common problem: if key not found in checkpoint, rm /tmp/cifar10_model is that's where you keep your checkpoint files. This is caused by changing resnet size. 
