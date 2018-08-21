@@ -33,3 +33,7 @@ Follow the following steps to test the kernel on Resnet on CIFAR10. If you are g
 4. Run python cifar10_main.py with your desired options. 
 
 Common problem: if key not found in checkpoint, rm /tmp/cifar10_model is that's where you keep your checkpoint files. This is caused by changing resnet size. 
+
+Todos:
+1. make kernel faster
+2. Improve profiling with tf profiler. https://stackoverflow.com/questions/45719176/how-to-display-runtime-statistics-in-tensorboard-using-estimator-api-in-a-distri
