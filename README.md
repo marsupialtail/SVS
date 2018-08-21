@@ -28,6 +28,6 @@ print(b)
 Follow the following steps to test the kernel on Resnet on CIFAR10. If you are going to do this, I recommend removing all the print statements in the .cu.cc file.
 
 1. Download tensorflow/models/official/resnet
-2. Make sure approx_kernel.so is in the folder. 
+2. Make sure the shared library file that you compiled earlier approx_kernel.so is in the resnet folder. 
 3. Replace resnet_model.py in the directory with resnet_model.py in the repo
 4. Run python cifar10_main.py with your desired options. 
