@@ -10,11 +10,18 @@ approx_module = tf.load_op_library('./approx_kernel.so')
 
 filter_x = 5
 filter_y = 5
-batch = 128
-ic = 5
+batch = 64
+ic = 64
 
-image = tf.constant(np.random.random((batch, 15, 15, ic)),dtype=tf.float32)
-dy = tf.constant(np.random.random((batch, 10, 10, 64)),dtype=tf.float32)
+image = tf.constant(np.random.random((batch, 55, 55, ic)),dtype=tf.float32)
+dy = tf.constant(np.random.random((batch, 50, 50, 64)),dtype=tf.float32)
+
+NCHW_image = tf.transpose(image,perm=[0,3,1,2])
+NCHW_dy = tf.transpose(dy,perm=[0,3,1,2])
+
+for i in range(1):
+	kernel_output = approx_module.tony_conv_grad(NCHW_image,NCHW_dy,1,filter_x,filter_y)
+kernel_output_t = tf.transpose(kernel_output,perm=[2,3,1,0])
 
 reshaped_dy = tf.reshape(dy,[-1, dy.shape[1] * dy.shape[2], dy.shape[3]])
 max_idx = tf.argmax(tf.abs(reshaped_dy), axis=1)
@@ -39,11 +46,7 @@ d = tf.squeeze(tf.stack([a, tf.cast(b, tf.int32), tf.cast(c, tf.int32)], axis=3)
 ref_result = tf.gather_nd(image,d)
 ref_result = tf.reduce_mean(tf.multiply(scaling,ref_result),axis=0)
 
-NCHW_image = tf.transpose(image,perm=[0,3,1,2])
-NCHW_dy = tf.transpose(dy,perm=[0,3,1,2])
 
-kernel_output = approx_module.tony_conv_grad(NCHW_image,NCHW_dy)
-kernel_output_t = tf.transpose(kernel_output,perm=[2,3,1,0])
 
 real_reference = []
 for j in range(batch):

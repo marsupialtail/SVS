@@ -63,12 +63,7 @@ class TonyConvGradOp : public OpKernel {
     output_shape.AddDim(filter_x_);
     output_shape.AddDim(filter_y_);
 
-/*
-    output_shape.AddDim(filter_x_);
-    output_shape.AddDim(filter_y_);
-    output_shape.AddDim(input_channels);
-    output_shape.AddDim(y_channels);
-*/
+
     //std::cout << "result shape " <<  output_shape << std::endl;
 
     OP_REQUIRES_OK(context,context->allocate_output(0,output_shape,&output_tensor));
@@ -77,6 +72,10 @@ class TonyConvGradOp : public OpKernel {
 
     //std::cout << input.data() << std::endl;
     //std::cout << input_dims[0] << input_dims[1] << input_dims[2] << std::endl;
+
+
+    const float * test = input.data();
+    //std::cout << test[0] << std::endl;
 
     TonyConvGradKernelLauncher(input.data(), input_dims, dy.data(), output_dims, output.data(),
         filter_x_,filter_y_,stride_);
@@ -89,4 +88,3 @@ class TonyConvGradOp : public OpKernel {
 };
 
 REGISTER_KERNEL_BUILDER(Name("TonyConvGrad").Device(DEVICE_GPU), TonyConvGradOp);
-

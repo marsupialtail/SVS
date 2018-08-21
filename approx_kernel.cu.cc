@@ -87,6 +87,9 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
   // load stuff into registers that will be used over and over again. Try to think about memory IO here
   int input_channels = is_1;
 
+  // data has dimensions input_channels by filter_x by filter_y
+  int input_thread_offset = threadIdx.x * input_channels * is_2 * is_3;
+
   // copy the corresponding patch of input into shared memory.
   // note there is no mention of blockIdx.x since input doesn't know about output channels.
 
@@ -94,16 +97,16 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
 
   for(int c=threadIdx.x;c<input_channels+threadIdx.x;c++){
     int data_channel_offset = (c % input_channels) * filter_x_ * filter_y_;
-    int input_channel_offset = (c % input_channels) * is_2 * is_3 * blockDim.x;
+    int input_channel_offset = (c % input_channels) * is_2 * is_3;
 
     for(int j=0;j<filter_x_;j++){
       int data_row_offset = j * filter_y_;
-      int input_row_offset = (j+max_row) * is_3 * blockDim.x;
+      int input_row_offset = (j+max_row) * is_3;
 
       for(int k=0;k<filter_y_;k++)
       {
         int data_idx = data_channel_offset + data_row_offset + k;
-        int input_idx = input_channel_offset + input_row_offset + (k+max_col) * blockDim.x + threadIdx.x;
+        int input_idx = input_thread_offset + input_channel_offset + input_row_offset + k+max_col;
 
         // introducing this race condition saves 0.3 seconds
         //atomicAdd(&data[data_idx], input[input_idx] * sum);
