@@ -32,6 +32,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+approx_module = tf.load_op_library('./approx_kernel.so')
 
 _BATCH_NORM_DECAY = 0.997
 _BATCH_NORM_EPSILON = 1e-5
@@ -130,67 +131,38 @@ def conv2d_fixed_padding(inputs, filters, kernel_size, strides, data_format):
 
             def tony_grad():
 
+                filter_x = filter.get_shape().as_list()[0]
+                filter_y = filter.get_shape().as_list()[1]
+
                 print(filter.get_shape().as_list())
-                assert data_format == "channels_last"
-
-                reshaped_dy = tf.reshape(dy,
-                                         [-1, dy.shape[1] * dy.shape[2], dy.shape[3]])
-                max_idx = tf.argmax(tf.abs(reshaped_dy), axis=1)
-                scaling = tf.expand_dims(tf.reduce_sum(tf.reduce_sum(reshaped_dy,axis=2,keepdims=True),axis=1,keepdims=True),axis=3)
-                row_idx = max_idx // dy.get_shape().as_list()[1] * stride_list[1]
-                col_idx = max_idx % dy.get_shape().as_list()[1] * stride_list[2]
-
-
-
-                print(dy.get_shape().as_list())
-                print(reshaped_dy.get_shape().as_list())
-
-                print(max_idx.get_shape().as_list())
-
-                assert row_idx.get_shape().as_list()[1] == filter.get_shape().as_list()[3], row_idx
-                slices = []
-
+                assert data_format == "channels_first"
 
                 if padding == 'VALID':
 
-                    for i in range(filter.get_shape().as_list()[3]):
-                        start_idx = tf.stack([row_idx[:, i], col_idx[:, i]], axis=1)
-                        glimpses = tf.image.extract_glimpse(input, [filter.get_shape().as_list()[0], filter.get_shape().as_list()[1]],
-                                                            tf.cast(start_idx, tf.float32), centered=False,
-                                                            normalized=False)
-                        glimpses = tf.multiply(scaling,glimpses)
-                        slices.append(tf.reduce_mean(glimpses, axis=0))
-
+                    tony = approx_module.tony_conv_grad(input, dy, stride_list[2],filter_x, filter_y)
+                    print(tony.shape)
                     return [
                         tf.nn.conv2d_backprop_input(input_sizes=tf.shape(input), filter=filter, out_backprop=dy,
                                                     strides=stride_list,
                                                     padding=padding,data_format=conversion_dict[data_format]),
-                        tf.stack(slices, axis=3)]
+                    tf.transpose(tony,perm=[2,3,1,0])]
                 else:
 
                     left_pad1 = filter.shape[0] // 2
                     right_pad1 = filter.shape[0] - left_pad1
                     left_pad2 = filter.shape[1] // 2
                     right_pad2 = filter.shape[1] - left_pad2
-                    padded_input = tf.pad(input, [[0, 0], [left_pad1, right_pad1], [left_pad2, right_pad2], [0, 0]])
+                    padded_input = tf.pad(input, [[0, 0], [0,0], [left_pad1, right_pad1], [left_pad2, right_pad2]])
 
-                    # verify that the reshape actually works
-
-                    for i in range(filter.get_shape().as_list()[3]):
-                        start_idx = tf.stack([row_idx[:, i], col_idx[:, i]], axis=1)
-                        glimpses = tf.image.extract_glimpse(padded_input, [filter.get_shape().as_list()[0], filter.get_shape().as_list()[1]],
-                                                            tf.cast(start_idx, tf.float32), centered=False,
-                                                            normalized=False)
-                        glimpses = tf.multiply(scaling,glimpses)
-                        slices.append(tf.reduce_mean(glimpses, axis=0))
+                    tony = approx_module.tony_conv_grad(padded_input, dy, stride_list[2],filter_x, filter_y)
+                    print(tony.shape)
 
                     return [
                         tf.nn.conv2d_backprop_input(input_sizes=tf.shape(input), filter=filter, out_backprop=dy,
                                                     strides=stride_list,
-                                                    padding=padding,data_format=conversion_dict[data_format]),
-                        tf.stack(slices, axis=3)]
+                                                    padding=padding,data_format=conversion_dict[data_format]),  tf.transpose(tony,perm=[2,3,1,0])]
 
-            return tf.cond(tf.equal(tf.mod(selector * 10001, 2), 1), tony_grad, tony_grad)
+            return tf.cond(tf.equal(tf.mod(selector * 10001, 2), 1), regular_grad, tony_grad)
 
         return tf.nn.conv2d(input, filter, strides=stride_list, padding=padding,data_format=conversion_dict[data_format]), grad
 
