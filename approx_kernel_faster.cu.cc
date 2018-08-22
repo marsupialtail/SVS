@@ -119,7 +119,8 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
   }
 
   t1 = clock();
-//got it. I'd recommend splitting the work up by C. So you would have an outer loop over the C dimension. Then in each iteration, each thread loads the patch for one channel for one image (still using CHWN for bandwidth) into a shared memory scratch buffer. Then in the second phase of the iteration, 
+   // I have N patches of size C*H*W. I want ONE patch of C*H*W which is the average of the N. 
+   // splitting the work up by C. So you would have an outer loop over the C dimension. Then in each iteration, each thread loads the patch for one channel for one image (still using CHWN for bandwidth) into a shared memory scratch buffer. Then in the second phase of the iteration, 
    // you remap so that each thread gets one of H*W pixels and does the reduction into the result shared memory buffer
   for(int c = 0; c< input_channels; c++)
   {
