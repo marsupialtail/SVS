@@ -103,7 +103,6 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
 
   int scratch = input[100];
 
-
   t2 = clock();
 
   if(blockIdx.x==0){
@@ -120,140 +119,153 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
     printf("%d ",t2-t1);
   }
 
-//printf("filterx: %d\n",is_3);
- t1 = clock();
-
-int c;
+t1 = clock();
+int c, a, b, c1, d, e;
+int incr_data = filter_y_ * is_3;
+int input_incr = is_2 * is_3;
+int input_channel_offset = 0;
+int data_row_offset = 0;
+int input_offset = max_row * is_2 * is_3 + max_col * is_3;
+int data_index = threadIdx.x;
+int data_index2 = input_offset + input_offset + threadIdx.x;
 for(c = 0; c<input_channels; c++)
 {
-        // t3 = clock();
-    // first read into shared memory
-    int input_channel_offset = c * is_1 * is_2 * is_3;
-    t3 = clock();
+ // t3 = clock();
+   // t5 = clock();
+    a = input[data_index2] * sum;
+        data_index2 += is_3;
+    b = input[data_index2] * sum;
+    data_index2 += is_3;
+    c1 = input[data_index2] * sum;
+    data_index2 += is_3;
+    d = input[data_index2] * sum;
+    data_index2 += is_3;
+    e = input[data_index2] * sum;
 
-    int data_row_offset = 0;
-    int input_offset = input_channel_offset +  max_row * is_2 * is_3 + max_col * is_3;
-    int data_index = data_row_offset + threadIdx.x;
-    int data_index2 = input_offset + input_offset + threadIdx.x;
+    data[data_index] = a;
+    data_index += is_3;
+    data[data_index] = b;
+    data_index += is_3;
+    data[data_index] = c1;
+    data_index += is_3;
+    data[data_index] = d;
+    data_index += is_3;
+    data[data_index] = e;
 
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 * is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
+   // t6 = clock();
 // Second row
-    data_row_offset +=  filter_y_ * is_3;
-    input_offset += is_2 * is_3;
-    data_index -= filter_y_ * 4 * is_3;
-    data_index2 -= is_3 * 4 * is_2;
+    data_row_offset +=  incr_data;
+    input_offset += input_incr;
+    data_index = data_row_offset + threadIdx.x;
+    data_index2 = input_offset + input_offset + threadIdx.x;
 
-    data[data_index] = input[data_index2] * sum;
+    a = input[data_index2] * sum;
+    data_index2 += is_3;
+    b = input[data_index2] * sum;
+    data_index2 += is_3;
+    c1 = input[data_index2] * sum;
+    data_index2 += is_3;
+    d = input[data_index2] * sum;
+    data_index2 += is_3;
+    e = input[data_index2] * sum;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+    data[data_index] = a;
+    data_index += is_3;
+    data[data_index] = b;
+    data_index += is_3;
+    data[data_index] = c1;
+    data_index += is_3;
+    data[data_index] = d;
+    data_index += is_3;
+    data[data_index] = e;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+//T hird row
+    data_row_offset +=  incr_data;
+    input_offset += input_incr;
+    data_index = data_row_offset + threadIdx.x;
+    data_index2 = input_offset + input_offset + threadIdx.x;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+    a = input[data_index2] * sum;
+    data_index2 += is_3;
+    b = input[data_index2] * sum;
+    data_index2 += is_3;
+    c1 = input[data_index2] * sum;
+    data_index2 += is_3;
+    d = input[data_index2] * sum;
+    data_index2 += is_3;
+    e = input[data_index2] * sum;
 
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-// Third row
-    data_row_offset +=  filter_y_ * is_3;
-    input_offset += is_2 * is_3;
-
-    data_index -= filter_y_ * 4 * is_3;
-    data_index2 -= is_3 * 4 * is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+    data[data_index] = a;
+    data_index += is_3;
+    data[data_index] = b;
+    data_index += is_3;
+    data[data_index] = c1;
+    data_index += is_3;
+    data[data_index] = d;
+    data_index += is_3;
+    data[data_index] = e;
 
 // Fourth row
-    data_row_offset +=  filter_y_ * is_3;
-    input_offset += is_2 * is_3;
+    data_row_offset +=  incr_data;
+    input_offset += input_incr;
+    data_index = data_row_offset + threadIdx.x;
+    data_index2 = input_offset + input_offset + threadIdx.x;
 
-    data_index -= filter_y_ * 4 * is_3;
-    data_index2 -= is_3 * 4 * is_2;
-    data[data_index] = input[data_index2] * sum;
+    a = input[data_index2] * sum;
+    data_index2 += is_3;
+    b = input[data_index2] * sum;
+    data_index2 += is_3;
+    c1 = input[data_index2] * sum;
+    data_index2 += is_3;
+    d = input[data_index2] * sum;
+    data_index2 += is_3;
+    e = input[data_index2] * sum;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+    data[data_index] = a;
+    data_index += is_3;
+    data[data_index] = b;
+    data_index += is_3;
+    data[data_index] = c1;
+    data_index += is_3;
+    data[data_index] = d;
+    data_index += is_3;
+    data[data_index] = e;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+//Fifth row
+    data_row_offset +=  incr_data;
+    input_offset += input_incr;
+    data_index = data_row_offset + threadIdx.x;
+    data_index2 = input_offset + input_offset + threadIdx.x;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+       a = input[data_index2] * sum;
+    data_index2 += is_3;
+    b = input[data_index2] * sum;
+    data_index2 += is_3;
+    c1 = input[data_index2] * sum;
+    data_index2 += is_3;
+    d = input[data_index2] * sum;
+    data_index2 += is_3;
+    e = input[data_index2] * sum;
 
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
+    data[data_index] = a;
+    data_index += is_3;
+    data[data_index] = b;
+    data_index += is_3;
+    data[data_index] = c1;
+    data_index += is_3;
+    data[data_index] = d;
+    data_index += is_3;
+    data[data_index] = e;
 
-// Fifth row
-    data_row_offset +=  filter_y_ * is_3;
-    input_offset += is_2 * is_3;
+  //reset inputs
+  input_channel_offset += is_1 * is_2 * is_3;
+  data_row_offset = 0;
+  input_offset = input_channel_offset +  max_row * is_2 * is_3 + max_col * is_3;
+  data_index = threadIdx.x;
+  data_index2 = input_offset + input_offset + threadIdx.x;
 
-    data_index -= filter_y_ * 4 * is_3;
-    data_index2 -= is_3 * 4 * is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    data_index += is_3 * filter_y_;
-    data_index2 += is_3 *  is_2;
-    data[data_index] = input[data_index2] * sum;
-
-    t4 = clock();
-
-
+//t4=clock();
+}
 
 //__syncthreads();
     // now reduce inside of shared memory, this can be made more parallel
@@ -274,16 +286,15 @@ for(c = 0; c<input_channels; c++)
 
     //__syncthreads();
 
-  }
+ // }
   // now do the parallel reduction, this can definitely be made better
   t2 = clock();
   if(blockIdx.x==0){
-     printf("Difference: %d ",t2-t1);
-    printf("Difference2: %d ",t4-t3);
-   // printf("Difference3: %d ",t6-t5);
-    //printf("Difference4: %d ",t8-t7);
+    printf("Difference: %d ",t2-t1);
+ //printf("Difference2: %d ",t4-t3);
+   // printf("Difference3 : %d ",t6-t5);
+   // printf("Difference4: %d ",t8-t7);
   }
-
 
 
 
@@ -322,6 +333,15 @@ void TonyConvGradKernelLauncher(const float * input, const int input_size_[], co
   //std::cout << "transferred to debug host variable" << std::endl;
 
   //std::cout << 0 << std::endl;
+
+  TonyConvKernelDraft<<<dy_size_[1],input_size_[3], data_size>>>(input,dy,output,filter_x_,filter_y_,stride,
+  input_size_[0],input_size_[1],input_size_[2],input_size_[3], dy_size_[0],dy_size_[1],dy_size_[2],dy_size_[3]);
+
+  //std::cout << "kernel finished successfully" << std::endl;
+  //float *d_debug = (float*) malloc(sizeof(float)*filter_x_*filter_y_*input_size[1]*dy_size[1]);
+  //std::cout << "transferred to debug host variable" << std::endl;
+
+  //std::cout << 0 << std::endl;
   //std::cout << cudaFree(data) << std::endl;
 //  for(int i = 0;i<filter_x_*filter_y_*input_size[1]*dy_size[1];i++)
 //  {
@@ -337,3 +357,4 @@ void TonyConvGradKernelLauncher(const float * input, const int input_size_[], co
 
 #endif
 
+                                                                                                             350,0-1       Bo
