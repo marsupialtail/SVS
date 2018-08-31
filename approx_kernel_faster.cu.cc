@@ -16,7 +16,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 
 void checkGpuMem()
-{
+{ 
   
   float free_m,total_m,used_m;
   size_t free_t,total_t;
@@ -121,19 +121,18 @@ __global__ void TonyConvKernelDraft(const float* input, const float* dy, float* 
 
 t1 = clock();
 int c, a, b, c1, d, e;
-int incr_data = filter_y_ * is_3;
-int input_incr = is_2 * is_3;
+//int incr_data = filter_y_ * is_3;
+//int input_incr = is_2 * is_3;
 int input_channel_offset = 0;
-int data_row_offset = 0;
 int input_offset = max_row * is_2 * is_3 + max_col * is_3;
 int data_index = threadIdx.x;
-int data_index2 = input_offset + input_offset + threadIdx.x;
-for(c = 0; c<input_channels; c++)
+int data_index2 = input_offset + input_offset + data_index;
+for(c = input_channels; c>=0; c--)
 {
- // t3 = clock();
+  //t3 = clock();
    // t5 = clock();
     a = input[data_index2] * sum;
-        data_index2 += is_3;
+    data_index2 += is_3;
     b = input[data_index2] * sum;
     data_index2 += is_3;
     c1 = input[data_index2] * sum;
@@ -154,16 +153,16 @@ for(c = 0; c<input_channels; c++)
 
    // t6 = clock();
 // Second row
-    data_row_offset +=  incr_data;
-    input_offset += input_incr;
-    data_index = data_row_offset + threadIdx.x;
-    data_index2 = input_offset + input_offset + threadIdx.x;
+    //input_offset += input_incr;
+    data_index += is_3;
+    data_index2 += 106 * is_3;
+     //data_index2 =  input_offset + input_offset + threadIdx.x;
 
     a = input[data_index2] * sum;
     data_index2 += is_3;
     b = input[data_index2] * sum;
     data_index2 += is_3;
-    c1 = input[data_index2] * sum;
+c1 = input[data_index2] * sum;
     data_index2 += is_3;
     d = input[data_index2] * sum;
     data_index2 += is_3;
@@ -180,10 +179,10 @@ for(c = 0; c<input_channels; c++)
     data[data_index] = e;
 
 //T hird row
-    data_row_offset +=  incr_data;
-    input_offset += input_incr;
-    data_index = data_row_offset + threadIdx.x;
-    data_index2 = input_offset + input_offset + threadIdx.x;
+    //input_offset += input_incr;
+    data_index += is_3;
+    //data_index2 = input_offset + input_offset + threadIdx.x;
+    data_index2 += 106 * is_3;
 
     a = input[data_index2] * sum;
     data_index2 += is_3;
@@ -206,11 +205,10 @@ for(c = 0; c<input_channels; c++)
     data[data_index] = e;
 
 // Fourth row
-    data_row_offset +=  incr_data;
-    input_offset += input_incr;
-    data_index = data_row_offset + threadIdx.x;
-    data_index2 = input_offset + input_offset + threadIdx.x;
-
+    //input_offset += input_incr;
+    data_index += is_3;
+//    data_index2 = input_offset + input_offset + threadIdx.x;
+data_index2 += 106 * is_3;
     a = input[data_index2] * sum;
     data_index2 += is_3;
     b = input[data_index2] * sum;
@@ -232,10 +230,11 @@ for(c = 0; c<input_channels; c++)
     data[data_index] = e;
 
 //Fifth row
-    data_row_offset +=  incr_data;
-    input_offset += input_incr;
-    data_index = data_row_offset + threadIdx.x;
-    data_index2 = input_offset + input_offset + threadIdx.x;
+    //input_offset += input_incr;
+    data_index += is_3;
+    //data_index2 = input_offset + input_offset + threadIdx.x;
+    data_index2 += 106 * is_3;
+
 
        a = input[data_index2] * sum;
     data_index2 += is_3;
@@ -259,11 +258,10 @@ for(c = 0; c<input_channels; c++)
 
   //reset inputs
   input_channel_offset += is_1 * is_2 * is_3;
-  data_row_offset = 0;
-  input_offset = input_channel_offset +  max_row * is_2 * is_3 + max_col * is_3;
-  data_index = threadIdx.x;
-  data_index2 = input_offset + input_offset + threadIdx.x;
-
+  //input_offset = input_channel_offset +  max_row * is_2 * is_3 + max_col * is_3;
+  data_index -= is_3 * 24;
+    data_index2 = input_channel_offset + input_offset + data_index;
+  //data_index2 -= 444 * is_3 - input_channel_offset;
 //t4=clock();
 }
 
@@ -291,12 +289,10 @@ for(c = 0; c<input_channels; c++)
   t2 = clock();
   if(blockIdx.x==0){
     printf("Difference: %d ",t2-t1);
- //printf("Difference2: %d ",t4-t3);
+ printf("Difference2: %d ",t4-t3);
    // printf("Difference3 : %d ",t6-t5);
    // printf("Difference4: %d ",t8-t7);
   }
-
-
 
   int block_offset = blockIdx.x * input_channels * filter_x_ * filter_y_;
 
@@ -333,15 +329,6 @@ void TonyConvGradKernelLauncher(const float * input, const int input_size_[], co
   //std::cout << "transferred to debug host variable" << std::endl;
 
   //std::cout << 0 << std::endl;
-
-  TonyConvKernelDraft<<<dy_size_[1],input_size_[3], data_size>>>(input,dy,output,filter_x_,filter_y_,stride,
-  input_size_[0],input_size_[1],input_size_[2],input_size_[3], dy_size_[0],dy_size_[1],dy_size_[2],dy_size_[3]);
-
-  //std::cout << "kernel finished successfully" << std::endl;
-  //float *d_debug = (float*) malloc(sizeof(float)*filter_x_*filter_y_*input_size[1]*dy_size[1]);
-  //std::cout << "transferred to debug host variable" << std::endl;
-
-  //std::cout << 0 << std::endl;
   //std::cout << cudaFree(data) << std::endl;
 //  for(int i = 0;i<filter_x_*filter_y_*input_size[1]*dy_size[1];i++)
 //  {
@@ -356,5 +343,3 @@ void TonyConvGradKernelLauncher(const float * input, const int input_size_[], co
 }
 
 #endif
-
-                                                                                                             350,0-1       Bo
