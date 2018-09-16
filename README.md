@@ -37,3 +37,6 @@ Common problem: if key not found in checkpoint, rm /tmp/cifar10_model is that's 
 Todos:
 1. make kernel faster
 2. Improve profiling with tf profiler. https://stackoverflow.com/questions/45719176/how-to-display-runtime-statistics-in-tensorboard-using-estimator-api-in-a-distri
+3. Examine the possiblity of writing a kernel to just zero out everything except the max elements, and then try to do with a sparse convolution kernel, such as https://github.com/Connor323/Convolution-with-sparse-kernel-in-TF. This might be easier and more portable. 
+4. Examine the possiblity of approximating the input tensor gradient as well. I am currently doing that. 
+5. Optimize the placement of approximations throughout the resnet layers. 
