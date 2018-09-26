@@ -1,6 +1,7 @@
 The speed of resnet-20 training with
 
 - Every other layer custom grad, excluding size 1 filter. somewhere around 6.6 (2.0 on gtx 1080 not compil optimized for it though) (almost there!!!)
+- If I transpose the input and use NHWC kernel, somewhere around 6.5. 
 - Every other layer custom grad, empty kernel launch, excluding size 1 filter: 6.18
 - Regular grad: 6.7 (2.1 on gtx1080)
 -regular grad without all the switching overhead 6.6. The switching overhead is not significant. 
