@@ -19,5 +19,6 @@ If we only ever use the patch at 1,1, the acc can get to 80%
 Notes for approximating input gradient:
 - if we just pass back tf.zeros, every other layer custom grad, excluding size 1 filter. we are going to have 5.774 with tony_grad for the filters. This means the potential saving for input_layer grad approx is around 1 second for every other layer, similar to the potential savings for the filter grad approx, which is expected. 
 
-
+Notes for offloading sum and max_idx calc to Tensorflow
+- Don't do it. It's too slow. (6.7 baseline with no calc in my kernel)
 
