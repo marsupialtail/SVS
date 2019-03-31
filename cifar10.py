@@ -47,9 +47,10 @@ import tensorflow as tf
 import cifar10_input
 
 approx_module1 = tf.load_op_library('./approx_kernel1.so')
-approx_module2 = tf.load_op_library('./approx_kernel2.so')
+#approx_module2 = tf.load_op_library('./approx_kernel2.so')
 FLAGS = tf.app.flags.FLAGS
 DF = "NCHW"
+global layer 
 layer = 0
 # Basic model parameters.
 tf.app.flags.DEFINE_integer('batch_size', 128,
@@ -214,7 +215,6 @@ def inference(images):
         def grad(dy):
             selector = tf.floor(tf.reduce_sum(dy[0,0,0]))
             print(selector.shape)
-
             def regular_grad():
                 return [
                     tf.nn.conv2d_backprop_input(input_sizes=tf.shape(input), filter=filter, out_backprop=dy,
@@ -225,7 +225,8 @@ def inference(images):
                                                  padding=padding, data_format=DF)]
 
             def tony_grad():
-
+           
+                global layer
                 print(filter.get_shape().as_list())
                 filter_x = filter.get_shape().as_list()[0]
                 filter_y = filter.get_shape().as_list()[1]
@@ -250,17 +251,18 @@ def inference(images):
                     right_pad2 = filter.shape[1] - left_pad2
 
                     with tf.device('/gpu:0'):
-                        padded_input = tf.pad(input, [[0, 0], [0,0] [left_pad1, right_pad1], [left_pad2, right_pad2]])
+                        padded_input = tf.pad(input, [[0, 0], [0,0], [left_pad1, right_pad1], [left_pad2, right_pad2]])
                         NHWC_input = tf.transpose(padded_input, perm=[0, 2,3,1])
                         if layer == 0:
                             tony = tf.transpose(
-                            approx_module2.tony_conv_grad(NHWC_input, dy, stride_list[2], filter_x, filter_y),
-                            perm=[2, 3, 1, 0])
+                            approx_module1.tony_conv_grad(NHWC_input, dy, stride_list[2], filter_x, filter_y),
+                            perm=[2, 1, 3, 0])
                             layer += 1
                         else:
+                            #TODO: figure out why we actually need to change this transpose. WTF?
                             tony = tf.transpose(
                             approx_module1.tony_conv_grad(NHWC_input, dy, stride_list[2], filter_x, filter_y),
-                            perm=[2, 3, 1, 0])
+                            perm=[2, 1,3, 0])
 
                         return [
                             tf.nn.conv2d_backprop_input(input_sizes=tf.shape(input), filter=filter, out_backprop=dy,
@@ -268,7 +270,7 @@ def inference(images):
                                                         padding=padding, data_format=DF),
                             tony]
 
-            return tf.cond(tf.equal(tf.mod(selector * 10001, 2), 1), regular_grad, regular_grad)
+            return tf.cond(tf.equal(tf.mod(selector * 10001, 2), 1), tony_grad, regular_grad)
 
         return tf.nn.conv2d(input, filter, strides=stride_list, padding=padding,
                             data_format=DF), grad
@@ -306,9 +308,9 @@ def inference(images):
                                              shape=[5, 5, 64, 64],
                                              stddev=5e-2,
                                              wd=None)
-        conv = tf.nn.conv2d(pool1, kernel,[1,1,1,1],'SAME',data_format=DF)
-        #conv = tony_conv(pool1, kernel)
-        biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
+        #conv = tf.nn.conv2d(pool1, kernel,[1,1,1,1],'SAME',data_format=DF)
+        conv = tony_conv(pool1, kernel)
+        #biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
         pre_activation = tf.nn.bias_add(conv, biases, data_format = DF)
         conv2 = tf.nn.relu(pre_activation, name=scope.name)
         _activation_summary(conv2)
