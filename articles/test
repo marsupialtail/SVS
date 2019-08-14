@@ -1,0 +1,66 @@
+  164  bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  165  vim ~/.bashrc
+  166  $HOME
+  167  cd /Users/marsupial-tail/bin/
+  168  ls
+  169  cd
+  170  vim ~/.bashrc
+  171  source ~/.bashrc
+  172  bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  173  cd scratch/tensorflow/
+  174  bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  175  ./configure
+  176  bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  177  pip install enum
+  178  sudo pip install enum
+  179  sudo pip install matplotlib
+  180  sudo pip install matplotlib
+  181  pip install enum
+  182  bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  183  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  184  pip install python-enum34
+  185  pip install enum34
+  186  sudo pip install enum34
+  187  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  188  sudo apt-get install python-numpy python-dev python-pip python-wheel
+  189  pip install wheel
+  190  sudo pip install wheel
+  191  sudo pip install six
+  192  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  193  sudo pip install mock
+  194  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  195  sudo pip install mock
+  196  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  197  sudo pip install mock
+  198  sudo pip install --upgrade mock
+  199  sudo /usr/bin/env pip uninstall mock
+  200  sudo /usr/bin/env pip uninstall six
+  201  sudo pip install --ignored-installed six
+  202  sudo pip install --ignore-installed six
+  203  sudo pip install --ignore-installed mock
+  204  sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+  205  sudo pip install /tmp/tensorflow_pkg/tensorflow-1.9.0-py2-none-any.whl
+  206  ls
+  207  rm -Rf /tmp/tensorflow_pkg
+  208  mkdir /tmp/tensorflow_pkg
+  209  bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+  210  sudo pip install /tmp/tensorflow_pkg/tensorflow-1.9.0-py2-none-any.whl
+  211  sudo pip install /tmp/tensorflow_pkg/tensorflow-1.9.0-cp27-cp27m-macosx_10_13_intel.whl 
+  212  sudo pip --ignore_installed install /tmp/tensorflow_pkg/tensorflow-1.9.0-cp27-cp27m-macosx_10_13_intel.whl 
+  213  sudo pip --ignore_\-installed install /tmp/tensorflow_pkg/tensorflow-1.9.0-cp27-cp27m-macosx_10_13_intel.whl 
+  214  sudo pip --ignore-installed install /tmp/tensorflow_pkg/tensorflow-1.9.0-cp27-cp27m-macosx_10_13_intel.whl 
+  215  sudo pip install --ignore-installed /tmp/tensorflow_pkg/tensorflow-1.9.0-cp27-cp27m-macosx_10_13_intel.whl 
+  216  python
+  217  sudo pip install platform
+  218  python
+  219  cd
+  220  python
+  221  cd scratch/tensorflow/
+  222  cd tensorflow/
+  223  cd core/user_ops/
+  224  ls
+  225  cd ../../examples/
+  226  ls
+  227  cd adding_an_op/
+  228  ls
+  229  history > ../../../../test

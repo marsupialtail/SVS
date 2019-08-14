@@ -106,12 +106,6 @@ __global__ void TonyConvKernelDraft(const float* __restrict__ input, const float
     }
     sum = sum + dy[i];
   }
-
-  // note that this works for out_channels > 32. Why? Because in this case redundant work is done.
-  // Each warp has a self-consistent view of the entire output processed for each thread_group.
-  // so the output iamge is processed thread_group/warp_size times. This saves a lot of trouble.
-
-  sum = warpReduceSum(sum,width);
   for(int i = 0;i< K;i++)
   {
       if (maxv == warpReduceMax(maxv,width))

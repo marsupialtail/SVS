@@ -1,0 +1,2 @@
+The argmax probably doesn't have to do exact. In CUDA, perhaps we can skip the atomics and allow for race conditions. 
+Similarly, the sum doesn't have to be exact as well. Again, skip atomics?

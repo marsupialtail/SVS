@@ -153,7 +153,6 @@ void TonyConvGradKernelLauncher(const float * input, const int input_size_[], co
   // std::cout << "allocating memory " << cudaMalloc((void**)&data, data_size * 2) << " " << data_size << std::endl;
 
   //std::cout << input_size_[0]*filter_x_*filter_y_*input_size_[1] << std::endl;
-
   cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);
 
   cudaProfilerStart();

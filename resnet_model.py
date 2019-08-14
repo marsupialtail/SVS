@@ -139,7 +139,6 @@ def conv2d_fixed_padding(inputs, filters, kernel_size, strides, data_format):
                 filter_x = filter.get_shape().as_list()[0]
                 filter_y = filter.get_shape().as_list()[1]
 
-
                 assert data_format == "channels_first"
 
                 if padding == 'VALID':

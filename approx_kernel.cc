@@ -1,5 +1,9 @@
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a222eae67e371cd7ed234b6f510c059bbcd93e8
 using namespace tensorflow;  // NOLINT(build/namespaces)
 
 REGISTER_OP("TonyConvGrad")
@@ -54,8 +58,11 @@ class TonyConvGradOp : public OpKernel {
     const int output_dims[4] = {batch_size,y_channels,dy_shape.dim_size(2),dy_shape.dim_size(3)};
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 7a222eae67e371cd7ed234b6f510c059bbcd93e8
     // Think very carefully about the shape of this. Will need to be transposed.
     Tensor * output_tensor = nullptr;
     TensorShape output_shape;
@@ -64,12 +71,16 @@ class TonyConvGradOp : public OpKernel {
     output_shape.AddDim(filter_x_);
     output_shape.AddDim(filter_y_);
 
+<<<<<<< HEAD
 /*
     output_shape.AddDim(filter_x_);
     output_shape.AddDim(filter_y_);
     output_shape.AddDim(input_channels);
     output_shape.AddDim(y_channels);
 */
+=======
+
+>>>>>>> 7a222eae67e371cd7ed234b6f510c059bbcd93e8
     //std::cout << "result shape " <<  output_shape << std::endl;
 
     OP_REQUIRES_OK(context,context->allocate_output(0,output_shape,&output_tensor));
@@ -77,7 +88,15 @@ class TonyConvGradOp : public OpKernel {
     auto output = output_tensor->template flat<float>();
 
     //std::cout << input.data() << std::endl;
+<<<<<<< HEAD
 //    std::cout << "NCHW launch params " << input_dims[0] << input_dims[1] << input_dims[2] << input_dims[3] << std::endl;
+=======
+    //std::cout << input_dims[0] << input_dims[1] << input_dims[2] << std::endl;
+
+
+    const float * test = input.data();
+    //std::cout << test[0] << std::endl;
+>>>>>>> 7a222eae67e371cd7ed234b6f510c059bbcd93e8
 
     TonyConvGradKernelLauncher(input.data(), input_dims, dy.data(), output_dims, output.data(),
         filter_x_,filter_y_,stride_);
@@ -90,4 +109,7 @@ class TonyConvGradOp : public OpKernel {
 };
 
 REGISTER_KERNEL_BUILDER(Name("TonyConvGrad").Device(DEVICE_GPU), TonyConvGradOp);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7a222eae67e371cd7ed234b6f510c059bbcd93e8
