@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <cuda_profiler_api.h>
 
-define FACTOR 16
+#define FACTOR 16
 #define B_FACTOR 8
 #define BATCH_SIZE 128
 #define K 1
@@ -170,7 +170,7 @@ torch::Tensor tony_conv_kernel(
     torch::Tensor dy,
     torch::Tensor stride,
     torch::Tensor filter_x_,
-    torch::Tensor filter_y_,
+    torch::Tensor filter_y_
 ) {
 
     const int batch_size = input.size(0);
@@ -191,7 +191,7 @@ torch::Tensor tony_conv_kernel(
     int threads = input_channels * FACTOR;
 
     if(batch_size == 128){
-        TonyConvKernelDraft<<<blocks,threads,data_size>>>(input.data_ptr(),dy.data_pr(),output.data_ptr(), filter_x,
+        TonyConvKernelDraft<<<blocks,threads,data_size>>>(input.data_ptr(),dy.data_ptr(),output.data_ptr(), filter_x,
         filter_y, stride, is_1,is_2, input_channels, ys_1, ys_2, ys_3);}
 
     return output;
