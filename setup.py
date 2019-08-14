@@ -6,7 +6,7 @@ setup(
     ext_modules=[
         CUDAExtension('tony_conv', [
             'approx_kernel_pytorch_cuda.cc',
-            'approx_kernel_pytorch_cuda.cu.cc',
+            'approx_kernel_pytorch_cuda.cu',
         ]),
     ],
     cmdclass={
