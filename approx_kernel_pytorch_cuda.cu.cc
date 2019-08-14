@@ -14,7 +14,7 @@
 #define BATCH_SIZE 128
 #define K 1
 #define OFF 3
-
+namespace{
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 __inline__ void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
@@ -196,4 +196,5 @@ torch::Tensor tony_conv_kernel(
 
     return output;
 
+}
 }
