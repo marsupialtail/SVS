@@ -168,7 +168,7 @@ __global__ void TonyConvKernelDraft(const float* __restrict__ input, const float
 torch::Tensor tony_conv_kernel(
     torch::Tensor input,
     torch::Tensor dy,
-    torch::Tensor stride,
+    torch::Tensor stride_,
     torch::Tensor filter_x_,
     torch::Tensor filter_y_
 ) {
@@ -183,6 +183,7 @@ torch::Tensor tony_conv_kernel(
 
     const int filter_x = * (filter_x_.data<int>());
     const int filter_y = * (filter_y_.data<int>());
+    const int stride = *(stride_.data<int>());
 
     auto output = torch::zeros({ys_1,filter_x,filter_y,input_channels});
 
@@ -191,7 +192,7 @@ torch::Tensor tony_conv_kernel(
     int threads = input_channels * FACTOR;
 
     if(batch_size == 128){
-        TonyConvKernelDraft<<<blocks,threads,data_size>>>(input.data_ptr(),dy.data_ptr(),output.data_ptr(), filter_x,
+        TonyConvKernelDraft<<<blocks,threads,data_size>>>((const float * )input.data_ptr(),(const float *)dy.data_ptr(),(float *)output.data_ptr(), filter_x,
         filter_y, stride, is_1,is_2, input_channels, ys_1, ys_2, ys_3);}
 
     return output;
