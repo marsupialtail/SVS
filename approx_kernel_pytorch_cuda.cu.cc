@@ -5,6 +5,49 @@
 
 #include <vector>
 
+#include <math.h>
+#include <stdio.h>
+#include <cuda_profiler_api.h>
+
+define FACTOR 16
+#define B_FACTOR 8
+#define BATCH_SIZE 128
+#define K 1
+#define OFF 3
+
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess)
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
+
+__inline__ __device__ float warpReduceSum(float sum, int width)
+{
+    if(width > 16)
+    sum += __shfl_xor_sync(0xffffffff,sum,16);
+    if(width > 8)
+    sum += __shfl_xor_sync(0xffffffff,sum,8);
+    sum += __shfl_xor_sync(0xffffffff,sum,4);
+    sum += __shfl_xor_sync(0xffffffff,sum,2);
+    sum += __shfl_xor_sync(0xffffffff,sum,1);
+    return sum;
+}
+__inline__ __device__ float warpReduceMax(float maxv, int width)
+{
+    if(width > 16)
+    maxv = max(__shfl_xor_sync(0xffffffff,maxv,16),maxv);
+    if(width > 8)
+    maxv = max(__shfl_xor_sync(0xffffffff,maxv,8),maxv);
+    maxv = max(__shfl_xor_sync(0xffffffff,maxv,4),maxv);
+    maxv = max(__shfl_xor_sync(0xffffffff,maxv,2),maxv);
+    maxv = max(__shfl_xor_sync(0xffffffff,maxv,1),maxv);
+    return maxv;
+}
+
 __global__ void TonyConvKernelDraft(const float* __restrict__ input, const float* __restrict__ dy, float* output,
         const int filter_x_, const int filter_y_, const int stride, const int is_1, const int is_2, const int input_channels, const int ys_1,
         const int ys_2, const int ys_3) {
@@ -138,8 +181,8 @@ torch::Tensor tony_conv_kernel(
     const int ys_2 = dy.size(2);
     const int ys_3 = dy.size(3);
 
-    const int filter_x = filter_x_.data<int>();
-    const int filter_y = filter_y_.data<int>();
+    const int filter_x = * (filter_x_.data<int>());
+    const int filter_y = * (filter_y_.data<int>());
 
     auto output = torch::zeros({ys_1,filter_x,filter_y,input_channels});
 
