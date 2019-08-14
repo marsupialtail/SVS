@@ -164,7 +164,7 @@ __global__ void TonyConvKernelDraft(const float* __restrict__ input, const float
   }
 
 }
-
+}
 torch::Tensor tony_conv_kernel(
     torch::Tensor input,
     torch::Tensor dy,
@@ -197,5 +197,4 @@ torch::Tensor tony_conv_kernel(
 
     return output;
 
-}
 }
