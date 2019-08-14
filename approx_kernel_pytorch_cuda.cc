@@ -1,6 +1,16 @@
 #include <torch/extension.h>
 #include <vector>
 
+torch::Tensor tony_conv_kernel(
+
+    torch::Tensor input,
+    torch::Tensor dy,
+    torch::Tensor stride,
+    torch::Tensor filter_x,
+    torch::Tensor filter_y
+
+) ;
+
 torch::Tensor tony_conv(
 
     torch::Tensor input,
