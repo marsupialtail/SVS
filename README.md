@@ -15,7 +15,7 @@ Now you should see approx_kernel.so.
 Run this simple test:
 ```bash
 import tensorflow as tf
-approx_module = tf.load_op_library('./approx_kernel.so')
+approx_module = tf.load_op_library('./CUDA_kernels/approx_kernel.so')
 
 a = np.ones((10,3,20,20)).astype(np.float32)
 a = tf.constant(a,dtype=tf.float32)
